@@ -1,0 +1,816 @@
+Assignment 7
+#include <iostream>
+using namespace std;
+class Graph
+{
+public:
+    int mat[10][10];
+    string vertex[10];
+    int n, m, c;
+    int stack[10];
+    int E;
+    Graph()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                mat[i][j] = 0;
+            }
+        }
+    }
+
+    void create()
+    {
+        cout << "Enter no of Nodes in Graph :";
+        cin >> n;
+
+        for (int i = 0; i < n; i++)
+        {
+            cout << "Enter the name of node " << i + 1 << " :";
+            cin >> vertex[i];
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+
+                if (i == j)
+                {
+                    mat[i][j] = 0;
+                }
+
+                else if (mat[i][j] == 0)
+                {
+                    cout << "Is there edge between vertex " << vertex[i] <<" and vertex "<<vertex[j]<<"(If yes type 1 else 0) ";
+                            cin >>
+                        mat[i][j];
+                    mat[j][i] = mat[i][j];
+                }
+            }
+        }
+    }
+
+    void Display_mat()
+    {
+        cout << "\n";
+        for (int i = 0; i < n; i++)
+        {
+            cout << "\t" << vertex[i];
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            cout << "\n"
+                 << vertex[i];
+            ;
+
+            for (int j = 0; j < n; j++)
+            {
+
+                cout << "\t" << mat[i][j];
+            }
+        }
+    }
+
+    void DFS()
+    {
+        int vis[n];
+        int stack[2 * n];
+        int top = 0;
+        for (int i = 0; i < n; i++)
+        {
+            vis[i] = 0;
+        }
+
+        stack[top] = 0;
+
+        while (top != -1)
+        {
+            int node = stack[top];
+            top--;
+
+            if (vis[node] == 0)
+            {
+                cout << vertex[node] << " ";
+                vis[node] = 1;
+                for (int i = 0; i < n; i++)
+                {
+                    if (mat[node][i] != 0)
+                    {
+                        top++;
+                        stack[top] = i;
+                    }
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    void BFS()
+    {
+        int vis[n];
+        int queue[2 * n];
+        int front = 0, rear = 0;
+        for (int i = 0; i < n; i++)
+        {
+            vis[i] = 0;
+        }
+        queue[rear] = 0;
+        vis[0] = 1;
+        rear++;
+
+        while (front != rear)
+        {    
+            int node = queue[front];
+            front++;
+            cout << vertex[node] << " ";
+            for (int i = 0; i < n; i++)
+            {
+                if (mat[node][i] == 1 and vis[i] == 0)
+                {
+                    queue[rear] = i;
+                    rear++;
+                    vis[i] = 1;
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+int main()
+{
+    Graph g1;
+    int ch;
+
+    do
+    {
+        cout << "\nMenu\n1.Create graph\n2.Display Adjacency Matrix\n3.DFStraversal\n4.BSF traversal\n ";
+        cout << "Enter your choice :";
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            g1.create();
+            break;
+        case 2:
+            g1.Display_mat();
+            break;
+        case 3:
+            g1.DFS();
+            break;
+        case 4:
+            g1.BFS();
+            break;
+        }
+    } while (ch != 5);
+
+    return 0;
+}
+
+
+Assignment 8
+#include <iostream>
+#include <string.h>
+using namespace std;
+class Node
+{
+public:
+    int chain;
+    string word;
+    string mean;
+} obj[10];
+int hash_func(string wd)
+{
+    int key = 0;
+    for (int i = 0; i < wd.size(); i++)
+    {
+        key += wd[i];
+    }
+    return key % 10;
+}
+void collision(int key, string wd, string mn)
+{
+    int i = 1;
+    while (((key + i) % 10) < 10)
+    {
+        if (obj[(key + i) % 10].word == "-")
+        {
+            obj[(key + i) % 10].word = wd;
+            obj[(key + i) % 10].mean = mn;
+            obj[(key + i - 1) % 10].chain = (key + i) % 10;
+            break;
+        }
+        else
+        {
+            i++;
+        }
+    }
+}
+void hash_ini()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        obj[i].word = "-";
+        obj[i].mean = "-";
+        obj[i].chain = -1;
+    }
+}
+void hash_table()
+{
+    string wd, mn;
+    cout << " Enter a word :- ";
+    cin >> wd;
+    cout << endl;
+    cout << "Enter Meaning for word :- ";
+    cin >> mn;
+    cout << endl;
+    int hash_key = hash_func(wd);
+    if (obj[hash_key].word == "-")
+    {
+        obj[hash_key].word = wd;
+        obj[hash_key].mean = mn;
+    }
+    else
+    {
+        collision(hash_key, wd, mn);
+    }
+}
+void display()
+{
+    cout << "index"
+         << "\t"
+         << "word"
+         << "\t"
+         << "meaning"
+         << "\t"
+         << "chain" << endl;
+    for (int i = 0; i < 10; i++)
+    {
+        cout << i << "\t" << obj[i].word << "\t" << obj[i].mean << "\t" << obj[i].chain << endl;
+    }
+}
+void del_key(string word)
+{
+    int key = hash_func(word);
+    if (obj[key].word == word)
+    {
+        obj[key].word = "-";
+        obj[key].mean = "-";
+        obj[key].chain = -1;
+    }
+    else if (obj[key].word != word)
+    {
+        int target = obj[key].chain;
+        while (true)
+        {
+            if (obj[target].word == word)
+            {
+                obj[target - 1].chain = obj[target].chain;
+                obj[target].word = "-";
+                obj[target].mean = "-";
+                obj[target].chain = -1;
+                cout << "DEletion successful" << endl;
+                break;
+            }
+            target = obj[target].chain;
+        }
+    }
+    else
+    {
+        cout << "word not found" << endl;
+    }
+}
+void find(string word)
+{
+    int key = hash_func(word);
+    if (obj[key].word == word)
+    {
+        cout << "Found the Word" << endl;
+        cout << obj[key].word << " --> " << obj[key].mean << endl;
+    }
+    else if (obj[key].chain != -1)
+    {
+        int target = obj[key].chain;
+        while (true)
+        {
+            if (obj[target].word == word)
+            {
+                cout << "Found the Word" << endl;
+                cout << obj[target].word << " -->" << obj[target].mean << endl;
+                break;
+            }
+            target = obj[target].chain;
+        }
+    }
+    else
+    {
+        cout << "Not Found" << endl;
+    }
+}
+int main()
+{
+    int ch;
+    string del_wd;
+    string src;
+    hash_ini();
+    do
+    {
+        cout << "********* Enter Your Choice **********" << endl;
+        cout << "1. Insert data in hash table" << endl;
+        cout << "2. Display Hash Table" << endl;
+        cout << "3. Delete word from Hash Table" << endl;
+        cout << "4. Find word in a Hash Table" << endl;
+        cout << "5. Exit" << endl;
+        cout << "Enter your choice :- ";
+        cin >> ch;
+        cout << endl;
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter no of entries you want to make :- ";
+            int n;
+            cin >> n;
+            for (int i = 0; i < n; i++)
+            {
+                hash_table();
+            }
+            break;
+        case 2:
+            display();
+            break;
+        case 3:
+            cout << "Enter the word you want to delete :- ";
+            cin >> del_wd;
+            del_key(del_wd);
+            break;
+        case 4:
+            cout << "Enter the word you want to search :- ";
+            cin >> src;
+            find(src);
+            break;
+        }
+    } while (ch < 5);
+    cout << "Done Successfully" << endl;
+    return 0;
+}
+
+
+Assignment 10
+#include <iostream>
+#include<string>
+using namespace std;
+class dictionary;
+class node
+{
+ string word,meaning;
+ node *left,*right;
+public:
+ friend class dictionary;
+ node()
+ {
+  left=NULL;
+  right=NULL;
+ 
+ }
+ node(string word, string meaning)
+ {
+  this->word=word;
+  this->meaning=meaning;
+  left=NULL;
+  right=NULL;
+ }
+};
+ 
+class dictionary
+{
+ node *root;
+public:
+ dictionary()
+{
+  root=NULL;
+}
+ void create();
+ void inorder_rec(node *rnode);
+ void postorder_rec(node *rnode);
+ void inorder()
+ {
+  inorder_rec(root);
+ }
+ void postorder();
+ 
+ bool insert(string word,string meaning);
+ int search(string key);
+ 
+};
+int dictionary::search(string key)
+{
+ node *tmp=root;
+ int count;
+ if(tmp==NULL)
+ {
+  return -1;
+ }
+ if(root->word==key)
+  return 1;
+ while(tmp!=NULL)
+ {
+ 
+  if((tmp->word)>key)
+  {
+   tmp=tmp->left;
+   count++;
+  }
+  else if((tmp->word)<key)
+  {
+   tmp=tmp->right;
+   count++;
+  }
+  else if(tmp->word==key)
+  {
+   return ++count;
+  }
+ }
+ return -1;
+ 
+}
+void dictionary::postorder()
+{
+ postorder_rec(root);
+}
+void dictionary::postorder_rec(node *rnode)
+{
+ if(rnode)
+ {
+  postorder_rec(rnode->right);
+  cout<<" "<<rnode->word<<" : "<<rnode->meaning<<endl;
+  postorder_rec(rnode->left);
+ }
+}
+void dictionary::create()
+{
+ int n;
+ string wordI,meaningI;
+ cout<<"\nHow many Word to insert?:\n";
+ cin>>n;
+ for(int i=0;i<n;i++)
+ {
+  cout<<"\nENter Word: ";
+  cin>>wordI;
+  cout<<"\nEnter Meaning: ";
+  cin>>meaningI;
+  insert(wordI,meaningI);
+ }
+}
+void dictionary::inorder_rec(node *rnode)
+{
+ if(rnode)
+ {
+  inorder_rec(rnode->left);
+  cout<<" "<<rnode->word<<" : "<<rnode->meaning<<endl;
+  inorder_rec(rnode->right);
+ }
+}
+bool dictionary::insert(string word, string meaning)
+{
+ node *p=new node(word, meaning);
+ if(root==NULL)
+ {
+  root=p;
+  return true;
+ }
+ node *cur=root;
+ node *par=root;
+ while(cur!=NULL) //traversal
+ {
+  if(word>cur->word)
+  {par=cur;
+  cur=cur->right;
+  }
+  else if(word<cur->word)
+  {
+   par=cur;
+   cur=cur->left;
+  }
+  else
+  {
+   cout<<"\nWord is already in the dictionary.";
+   return false;
+  }
+ }
+ if(word>par->word) //insertion of node
+ {
+  par->right=p;
+  return true;
+ }
+ else
+ {
+  par->left=p;
+ 
+  return true;
+ }
+}
+ 
+int main() {
+ string word;
+ dictionary months;
+ months.create();
+ cout<<"Ascending order\n";
+ months.inorder();
+ 
+ cout<<"\nDescending order:\n";
+ months.postorder();
+ 
+ cout<<"\nEnter word to search: ";
+ cin>>word;
+ int comparisons=months.search(word);
+ if(comparisons==-1)
+ {
+  cout<<"\nNot found word";
+ }
+ else
+ {
+  cout<<"\n "<<word<<" found in "<<comparisons<<" comparisons";
+ }
+ return 0;
+}
+
+
+Assignment 11
+#include <iostream>
+#include <stdio.h>
+
+using namespace std;
+#define MAX 10
+void con_obst(void);
+void print(int, int);
+int p[MAX], q[MAX], w[10][10], c[10][10], r[10][10], i, j, k, n, m;
+char idnt[7][10];
+
+int main()
+{
+      cout << "enter the no, of identifiers: ";
+      cin >> n;
+      cout << "enter identifiers \n";
+      for (i = 1; i <= n; i++)
+            cin >> idnt[i];
+      cout << "Enter Success Probability For Identifiers: \n";
+      for (i = 1; i <= n; i++)
+            cin >> p[i];
+      cout << "Enter Failure Probability For Identifiers: ";
+      for (i = 0; i <= n; i++)
+      {
+            cin >> q[i];
+      }
+      con_obst();
+      print(0, n);
+      cout << endl;
+}
+
+void con_obst(void)
+{
+      int i, j, l;
+      for (i = 0; i < n; i++)
+      {
+            c[i][i] = 0.0;
+            r[i][i] = 0;
+            w[i][i] = q[i];
+            w[i][i + 1] = q[i] + q[i + 1] + p[i + 1];
+            c[i][i + 1] = q[i] + q[i + 1] + p[i + 1];
+            r[i][i + 1] = i + 1;
+      }
+      c[n][n] = 0.0;
+      r[n][n] = 0;
+      w[n][n] = q[n];
+      for (i = 2; i <= n; i++)
+      {
+            for (j = 0; j <= n - i; j++)
+            {
+                  w[j][j + i] = q[j + i] + p[j + i] + w[j][j + i - 1];
+                  c[j][j + i] = 9999;
+                  for (l = j + 1; l <= j + i; l++)
+                  {
+                        if (c[j][j + i] > (c[j][l - 1] + c[l][j + i]))
+                        {
+                              c[j][j + i] = c[j][l - 1] + c[l][j + i];
+                              r[j][j + i] = l;
+                        }
+                  }
+                  c[j][j + i] += w[j][j + i];
+            }
+            cout << endl;
+      }
+      cout << "\nOptimal BST is :: ";
+      cout << "\nw[0][" << n << "] :: " << w[0][n];
+      cout << "\nc[0][" << n << "] :: " << c[0][n];
+      cout << "\nr[0][" << n << "] :: " << r[0][n];
+}
+
+void print(int i, int j)
+{
+      if (i < j)
+            cout << "\n"<< idnt[r[i][j]];
+      else
+            return;
+      print(i, r[i][j] - 1);
+      print(r[i][j], j);
+}
+
+
+Assignment 12
+#include<iostream>
+#include<fstream>
+#include<stdio.h>
+using namespace std;
+class Employee{
+    private:
+        int code;
+        char name[20];
+        float salary;
+    public:
+        void read();
+        void display();
+        int getEmpCode()            { return code;}
+        int getSalary()             { return salary;}
+        void updateSalary(float s)  { salary=s;}
+};
+ 
+void Employee::read(){
+    cout<<"Enter employee code: ";
+    cin>>code;
+    cout<<"Enter name: ";
+    cin.ignore(1);
+    cin.getline(name,20);
+    cout<<"Enter salary: ";
+    cin>>salary;
+}
+void Employee::display()
+{
+    cout<<code<<" "<<name<<"\t"<<salary<<endl;
+}
+fstream file;
+ void deleteExistingFile(){
+    remove("EMPLOYEE.DAT");
+}
+ void appendToFille(){
+    Employee    x;
+         x.read();
+       file.open("EMPLOYEE.DAT",ios::binary|ios::app);
+    if(!file){
+        cout<<"ERROR IN CREATING FILE\n";
+        return;
+    }
+file.write((char*)&x,sizeof(x));
+    file.close();
+    cout<<"Record added sucessfully.\n";
+} 
+void displayAll(){
+    Employee    x;
+    file.open("EMPLOYEE.DAT",ios::binary|ios::in);
+    if(!file){
+        cout<<"ERROR IN OPENING FILE \n";
+        return;
+    }
+    while(file){
+    if(file.read((char*)&x,sizeof(x)))
+        if(x.getSalary()>=10000 && x.getSalary()<=20000)
+            x.display();
+    }
+  file.close();
+} 
+void searchForRecord(){
+    //read employee id
+    Employee    x;
+    int c;
+    int isFound=0;
+    cout<<"Enter employee code: ";
+    cin>>c;
+ file.open("EMPLOYEE.DAT",ios::binary|ios::in);
+    if(!file){
+        cout<<"ERROR IN OPENING FILE \n";
+        return;
+    }
+    while(file){
+        if(file.read((char*)&x,sizeof(x))){
+            if(x.getEmpCode()==c){
+                cout<<"RECORD FOUND\n";
+                x.display();
+                isFound=1;
+                break;
+            }
+        }
+    }
+    if(isFound==0){
+        cout<<"Record not found!!!\n";
+    }
+    file.close();
+}
+ void increaseSalary(){
+    //read employee id
+    Employee    x;
+    int c;
+    int isFound=0;
+    float sal;
+    cout<<"enter employee code \n";
+    cin>>c;
+    file.open("EMPLOYEE.DAT",ios::binary|ios::in);
+    if(!file){
+        cout<<"ERROR IN OPENING FILE \n";
+        return;
+    }
+    while(file){
+        if(file.read((char*)&x,sizeof(x))){
+            if(x.getEmpCode()==c){
+                cout<<"Salary hike? ";
+                cin>>sal;
+                x.updateSalary(x.getSalary()+sal);
+                isFound=1;
+                break;
+            }
+        }
+    }
+    if(isFound==0){
+        cout<<"Record not found!!!\n";
+    }
+    file.close();
+    cout<<"Salary updated successfully."<<endl;
+}
+ 
+//Insert record by assuming that records are in 
+//ascending order
+void insertRecord(){
+    //read employee record
+    Employee    x;
+    Employee newEmp;
+    newEmp.read();
+    fstream fin;
+    file.open("EMPLOYEE.DAT",ios::binary|ios::in);
+    //open file in write mode
+    fin.open("TEMP.DAT",ios::binary|ios::out);
+ 
+    if(!file){
+        cout<<"Error in opening EMPLOYEE.DAT file!!!\n";
+        return;
+    }
+    if(!fin){
+        cout<<"Error in opening TEMP.DAT file!!!\n";
+        return;
+    }
+    while(file){
+        if(file.read((char*)&x,sizeof(x))){
+            if(x.getEmpCode()>newEmp.getEmpCode()){
+                fin.write((char*)&newEmp, sizeof(newEmp));
+            }
+            //no need to use else
+            fin.write((char*)&x, sizeof(x));
+        }
+    }
+ 
+    fin.close();
+    file.close();
+     
+    rename("TEMP.DAT","EMPLOYEE.DAT");
+    remove("TEMP.DAT");
+    cout<<"Record inserted successfully."<<endl;
+}
+ 
+int main()
+{
+     char ch;
+    //if required then only remove the file
+     deleteExistingFile();
+     do{
+     int n;
+     cout<<"ENTER CHOICE\n"<<"1.ADD AN EMPLOYEE\n"<<"2.DISPLAY\n"<<"3.SEARCH\n"<<"4.INCREASE SALARY\n"<<"5.INSERT RECORD\n";
+     cout<<"Make a choice: ";
+     cin>>n;
+     switch(n){
+          case 1:
+            appendToFille();
+            break;
+          case 2 :
+            displayAll();
+            break;
+          case 3:
+            searchForRecord();
+            break;
+        case 4:
+            increaseSalary();
+            break;
+        case 5:
+            insertRecord();
+            break;
+          default :
+                cout<<"Invalid Choice\n";
+     }
+     cout<<"Do you want to continue ? : ";
+     cin>>ch;
+     }while(ch=='Y'||ch=='y'); 
+    return 0;
+}
+
+
+
+
